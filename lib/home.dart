@@ -29,13 +29,15 @@ class _HomePageState extends State<HomePage> {
         .from("subcategory")
         .select()
         .eq("category", _selectedCategory.slug)
-        .eq("sub_category_is_active", true);
+        .eq("sub_category_is_active", true)
+        .limit(3);
 
     final quizzes = await supabase
         .from("quiz")
         .select()
         .eq("quiz_category", _selectedCategory.slug)
         .eq("quiz_is_active", true)
+        .limit(3)
         .order(
           "quiz_name",
           ascending: true,
@@ -275,7 +277,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       Visibility(
                                         visible:
-                                            _loadedSubCategories.length > 4,
+                                            _loadedSubCategories.length >= 3,
                                         child: InkWell(
                                           child: const Text(
                                             "See All",
@@ -338,7 +340,8 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 24),
+                                    horizontal: 24,
+                                  ),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -351,7 +354,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       Visibility(
-                                        visible: _loadedQuizzes.length > 4,
+                                        visible: _loadedQuizzes.length >= 3,
                                         child: InkWell(
                                           child: const Text(
                                             "See All",
