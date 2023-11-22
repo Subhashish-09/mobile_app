@@ -19,10 +19,10 @@ class _AllCategoriesState extends State<AllCategories> {
         .select()
         .order("category_name", ascending: true);
 
-    List<HomeCategory> _loadedCategories = [];
+    List<HomeCategory> loadedCategories = [];
 
     for (final item in categories) {
-      _loadedCategories.add(
+      loadedCategories.add(
         HomeCategory(
           name: item['category_name'],
           slug: item['category_seo_slug'],
@@ -33,7 +33,7 @@ class _AllCategoriesState extends State<AllCategories> {
     }
 
     setState(() {
-      _allCategories = _loadedCategories;
+      _allCategories = loadedCategories;
     });
   }
 
