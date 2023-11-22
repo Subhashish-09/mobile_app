@@ -4,6 +4,7 @@ import 'package:mobile_app/helpers/auth/sign_out.dart';
 import 'package:mobile_app/helpers/loading_spinner.dart';
 import 'package:mobile_app/main.dart';
 import 'package:mobile_app/models/home/category.dart';
+import 'package:mobile_app/screens/categories/all_categories.dart';
 import 'package:mobile_app/screens/categories/category.dart';
 import 'package:mobile_app/screens/categories/subcategory.dart';
 import 'package:mobile_app/screens/quiz/quiz_details.dart';
@@ -47,7 +48,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _loadCategories() async {
-    final data = await supabase.from('category').select('*');
+    final data = await supabase
+        .from('category')
+        .select('*')
+        .limit(5)
+        .order("category_name", ascending: true);
 
     List<HomeCategory> loadedCategories = [];
 
@@ -91,9 +96,9 @@ class _HomePageState extends State<HomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Hi Subhashish',
-                        style: TextStyle(
+                      Text(
+                        'Hi ${supabase.auth.currentUser!.userMetadata!['name']}',
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
@@ -156,7 +161,13 @@ class _HomePageState extends State<HomePage> {
                             fontSize: 12,
                           ),
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const AllCategories(),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -264,7 +275,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       Visibility(
                                         visible:
-                                            _loadedSubCategories.length == 4,
+                                            _loadedSubCategories.length > 4,
                                         child: InkWell(
                                           child: const Text(
                                             "See All",
@@ -340,7 +351,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       Visibility(
-                                        visible: _loadedQuizzes.length < 4,
+                                        visible: _loadedQuizzes.length > 4,
                                         child: InkWell(
                                           child: const Text(
                                             "See All",
