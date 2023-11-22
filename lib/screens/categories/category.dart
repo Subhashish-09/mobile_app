@@ -10,9 +10,11 @@ import 'package:mobile_app/screens/categories/subcategory.dart';
 import 'package:mobile_app/main.dart';
 
 class SingleCategory extends StatefulWidget {
-  const SingleCategory({super.key, required this.categorySlug});
+  const SingleCategory(
+      {super.key, required this.categorySlug, required this.initialIndex});
 
   final String categorySlug;
+  final int initialIndex;
 
   @override
   State<SingleCategory> createState() => _SingleCategoryState();
@@ -103,6 +105,7 @@ class _SingleCategoryState extends State<SingleCategory> {
   Widget build(BuildContext context) {
     return _isLoaded
         ? DefaultTabController(
+            initialIndex: widget.initialIndex,
             length: 2,
             child: Scaffold(
               appBar: AppBar(

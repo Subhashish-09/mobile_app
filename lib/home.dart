@@ -1,8 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_app/components/categories_card.dart';
 import 'package:mobile_app/helpers/auth/sign_out.dart';
+import 'package:mobile_app/helpers/loading_spinner.dart';
 import 'package:mobile_app/main.dart';
 import 'package:mobile_app/models/home/category.dart';
+import 'package:mobile_app/screens/categories/category.dart';
+import 'package:mobile_app/screens/categories/subcategory.dart';
+import 'package:mobile_app/screens/quiz/quiz_details.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,6 +17,34 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<HomeCategory> _homeCategories = [];
+  List _loadedSubCategories = [];
+  List _loadedQuizzes = [];
+  bool _isLoaded = false;
+
+  late HomeCategory _selectedCategory;
+
+  void _loadSingleCategory() async {
+    final subjects = await supabase
+        .from("subcategory")
+        .select()
+        .eq("category", _selectedCategory.slug)
+        .eq("sub_category_is_active", true);
+
+    final quizzes = await supabase
+        .from("quiz")
+        .select()
+        .eq("quiz_category", _selectedCategory.slug)
+        .eq("quiz_is_active", true)
+        .order(
+          "quiz_name",
+          ascending: true,
+        );
+
+    setState(() {
+      _loadedSubCategories = subjects;
+      _loadedQuizzes = quizzes;
+    });
+  }
 
   void _loadCategories() async {
     final data = await supabase.from('category').select('*');
@@ -30,8 +62,13 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
+    await Future.delayed(const Duration(seconds: 2));
+
     setState(() {
       _homeCategories = loadedCategories;
+      _selectedCategory = loadedCategories[0];
+      _loadSingleCategory();
+      _isLoaded = true;
     });
   }
 
@@ -43,433 +80,332 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: ListView(
-          padding: const EdgeInsets.fromLTRB(0, 48, 0, 70),
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Hi Subhashish',
+    return _isLoaded
+        ? Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: ListView(
+              padding: const EdgeInsets.fromLTRB(0, 48, 0, 70),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Hi Subhashish',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          signOut(context, mounted);
+                        },
+                        child: const Stack(
+                          clipBehavior: Clip.none,
+                          children: <Widget>[
+                            Icon(
+                              Icons.logout,
+                              size: 22,
+                              color: Colors.black,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24),
+                  child: Text(
+                    'What would you learn today?',
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      signOut(context, mounted);
-                    },
-                    child: const Stack(
-                      clipBehavior: Clip.none,
-                      children: <Widget>[
-                        Icon(
-                          Icons.logout,
-                          size: 22,
-                          color: Colors.black,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                'What would you learn today?',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
                 ),
-              ),
-            ),
-            const SizedBox(
-              height: 24,
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Categories',
-                    style: TextStyle(
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
-                  InkWell(
-                    child: const Text(
-                      'See All',
-                      style: TextStyle(
-                        letterSpacing: 0,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
+                const SizedBox(
+                  height: 24,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Categories',
+                        style: TextStyle(
+                          letterSpacing: 0,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                    onTap: () {},
+                      InkWell(
+                        child: const Text(
+                          'See All',
+                          style: TextStyle(
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
+                        onTap: () {},
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  // for (final item in _homeCategories)
-                  // CategoryGridItem(
-                  //   title: item.title,
-                  //   imageUrl: item.imageUrl,
-                  //   onSelect: () {
-                  //     setState(() {
-                  //       selectedCategory = item.imageSlug;
-                  //     });
-                  //     _getCategoryData();
-                  //   },
-                  // ),
-                ],
-              ),
-            ),
-            // FxSpacing.height(24),
-            // Padding(
-            //   padding: FxSpacing.horizontal(24),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: [
-            //       FxText.titleMedium(
-            //         catDetails.isEmpty ? '' : catDetails['category_title'],
-            //         color: theme.colorScheme.onBackground,
-            //         fontWeight: 600,
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            // FxSpacing.height(16),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  // Padding(
-                  //   padding: FxSpacing.zero,
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //     children: [
-                  //       FxText.titleMedium(
-                  //         'Subjects',
-                  //         color: theme.colorScheme.onBackground,
-                  //         fontWeight: 600,
-                  //       ),
-                  //       FxText.bodySmall(
-                  //         'See All',
-                  //         color: theme.colorScheme.onBackground,
-                  //         fontWeight: 600,
-                  //         xMuted: true,
-                  //         letterSpacing: 0,
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                  // FxSpacing.height(16),
-                  // Padding(
-                  //   padding: FxSpacing.zero,
-                  //   child: Column(
-                  //     children: [
-                  //       for (final item in subjectDetails)
-                  //         InkWell(
-                  //           onTap: () {
-                  //             chaptersCount == 0
-                  //                 ? _loadScreens(
-                  //                     context,
-                  //                     SubjectPractiseTestsScreen(
-                  //                       category: selectedCategory,
-                  //                       subject: item['subject_slug'],
-                  //                     ),
-                  //                   )
-                  //                 : _changeScreen(
-                  //                     context,
-                  //                     item['subject_slug'],
-                  //                     selectedCategory,
-                  //                     item['subject_image_url'],
-                  //                   );
-                  //           },
-                  //           child: FxContainer(
-                  //             margin: FxSpacing.bottom(16),
-                  //             color: const Color.fromARGB(255, 240, 240, 240),
-                  //             child: Row(
-                  //               crossAxisAlignment: CrossAxisAlignment.start,
-                  //               children: [
-                  //                 FxContainer(
-                  //                   color:
-                  //                       const Color(0xff10bb6b).withAlpha(32),
-                  //                   padding: FxSpacing.all(8),
-                  //                   child: Hero(
-                  //                     tag: item['subject_title'],
-                  //                     child: ClipRRect(
-                  //                       clipBehavior:
-                  //                           Clip.antiAliasWithSaveLayer,
-                  //                       child: Image.network(
-                  //                         item['subject_image_url'],
-                  //                         width: 72,
-                  //                         height: 72,
-                  //                       ),
-                  //                     ),
-                  //                   ),
-                  //                 ),
-                  //                 FxSpacing.width(16),
-                  //                 Expanded(
-                  //                   child: Column(
-                  //                     crossAxisAlignment:
-                  //                         CrossAxisAlignment.start,
-                  //                     children: [
-                  //                       FxText.bodyMedium(
-                  //                         item['subject_title'],
-                  //                         color: Theme.of(context)
-                  //                             .colorScheme
-                  //                             .onBackground,
-                  //                         fontWeight: 600,
-                  //                       ),
-                  //                       FxSpacing.height(8),
-                  //                       FxText.labelSmall(
-                  //                         item['subject_description'],
-                  //                         color: Theme.of(context)
-                  //                             .colorScheme
-                  //                             .onBackground,
-                  //                         muted: true,
-                  //                       ),
-                  //                       FxSpacing.height(8),
-                  //                     ],
-                  //                   ),
-                  //                 ),
-                  //               ],
-                  //             ),
-                  //           ),
-                  //         )
-                  //     ],
-                  //   ),
-                  // ),
-                  // if (quizzes.isNotEmpty)
-                  //   Padding(
-                  //     padding: FxSpacing.zero,
-                  //     child: Row(
-                  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //       children: [
-                  //         FxText.titleMedium(
-                  //           'Quizzes',
-                  //           color: Theme.of(context).colorScheme.onBackground,
-                  //           fontWeight: 600,
-                  //         ),
-                  //         FxText.bodySmall(
-                  //           'See All',
-                  //           color: Theme.of(context).colorScheme.onBackground,
-                  //           fontWeight: 600,
-                  //           xMuted: true,
-                  //           letterSpacing: 0,
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // FxSpacing.height(16),
-                  // if (quizzes.isNotEmpty)
-                  //   Padding(
-                  //     padding: FxSpacing.zero,
-                  //     child: Column(
-                  //       children: [
-                  //         for (final item in quizzes)
-                  //           InkWell(
-                  //             onTap: () {},
-                  //             child: FxContainer(
-                  //               color: const Color.fromARGB(255, 240, 240, 240),
-                  //               margin: FxSpacing.bottom(16),
-                  //               child: Row(
-                  //                 crossAxisAlignment: CrossAxisAlignment.start,
-                  //                 children: [
-                  //                   FxContainer(
-                  //                     color:
-                  //                         const Color(0xff10bb6b).withAlpha(32),
-                  //                     padding: FxSpacing.all(8),
-                  //                     child: Hero(
-                  //                       tag: item['otest_title'],
-                  //                       child: ClipRRect(
-                  //                         clipBehavior:
-                  //                             Clip.antiAliasWithSaveLayer,
-                  //                         child: Image.network(
-                  //                           item['otest_image_url'],
-                  //                           width: 72,
-                  //                           height: 72,
-                  //                         ),
-                  //                       ),
-                  //                     ),
-                  //                   ),
-                  //                   FxSpacing.width(16),
-                  //                   Expanded(
-                  //                     child: Column(
-                  //                       crossAxisAlignment:
-                  //                           CrossAxisAlignment.start,
-                  //                       children: [
-                  //                         FxText.bodyMedium(
-                  //                           item['otest_title'],
-                  //                           color:
-                  //                               theme.colorScheme.onBackground,
-                  //                           fontWeight: 600,
-                  //                         ),
-                  //                         FxSpacing.height(8),
-                  //                         FxText.labelSmall(
-                  //                           item['otest_description'],
-                  //                           color:
-                  //                               theme.colorScheme.onBackground,
-                  //                           muted: true,
-                  //                         ),
-                  //                         FxSpacing.height(8),
-                  //                       ],
-                  //                     ),
-                  //                   ),
-                  //                 ],
-                  //               ),
-                  //             ),
-                  //           )
-                  //       ],
-                  //     ),
-                  //   ),
-                  // if (testSeries.isNotEmpty)
-                  //   Padding(
-                  //     padding: EdgeInsets.zero,
-                  //     child: Row(
-                  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //       children: [
-                  //         FxText.titleMedium(
-                  //           'Test Series',
-                  //           color: Theme.of(context).colorScheme.onBackground,
-                  //           fontWeight: 600,
-                  //         ),
-                  //         FxText.bodySmall(
-                  //           'See All',
-                  //           color: Theme.of(context).colorScheme.onBackground,
-                  //           fontWeight: 600,
-                  //           xMuted: true,
-                  //           letterSpacing: 0,
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  SizedBox(
-                    height: 16,
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (final item in _homeCategories)
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _selectedCategory = item;
+                            });
+                            _loadSingleCategory();
+                          },
+                          child: Container(
+                            width: 132,
+                            height: 132,
+                            color: const Color(0xff10bb6b).withAlpha(28),
+                            margin: const EdgeInsets.only(left: 16, right: 16),
+                            child: Column(
+                              children: [
+                                Image.network(
+                                  item.image,
+                                  height: 80,
+                                  width: 80,
+                                ),
+                                const SizedBox(
+                                  height: 4,
+                                ),
+                                Text(
+                                  item.name,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                  // if (testSeries.isNotEmpty)
-                  //   Padding(
-                  //     padding: EdgeInsets.zero,
-                  //     child: Column(
-                  //       children: [
-                  //         for (final item in testSeries)
-                  //           InkWell(
-                  //             onTap: () {},
-                  //             child: Container(
-                  //               color: const Color.fromARGB(255, 240, 240, 240),
-                  //               margin: EdgeInsets.only(bottom: 16),
-                  //               child: Row(
-                  //                 crossAxisAlignment: CrossAxisAlignment.start,
-                  //                 children: [
-                  //                   Container(
-                  //                     color:
-                  //                         const Color(0xff10bb6b).withAlpha(32),
-                  //                     padding: EdgeInsets.all(8),
-                  //                     child: Hero(
-                  //                       tag: item['series_title'],
-                  //                       child: ClipRRect(
-                  //                         clipBehavior:
-                  //                             Clip.antiAliasWithSaveLayer,
-                  //                         child: Image.network(
-                  //                           item['series_image_url'],
-                  //                           width: 72,
-                  //                           height: 72,
-                  //                         ),
-                  //                       ),
-                  //                     ),
-                  //                   ),
-                  //                   SizedBox(
-                  //                     width: 16,
-                  //                   ),
-                  //                   Expanded(
-                  //                     child: Column(
-                  //                       crossAxisAlignment:
-                  //                           CrossAxisAlignment.start,
-                  //                       children: [
-                  //                         Text(
-                  //                           item['series_title'],
-                  //                           style: TextStyle(
-                  //                             color: Colors.black,
-                  //                             fontWeight: FontWeight.w600,
-                  //                             fontSize: 16,
-                  //                           ),
-                  //                         ),
-                  //                         SizedBox(
-                  //                           height: 8,
-                  //                         ),
-                  //                         FxText.labelSmall(
-                  //                           item['series_description'],
-                  //                           color:
-                  //                               theme.colorScheme.onBackground,
-                  //                           muted: true,
-                  //                         ),
-                  //                       ],
-                  //                     ),
-                  //                   ),
-                  //                 ],
-                  //               ),
-                  //             ),
-                  //           )
-                  //       ],
-                  //     ),
-                  //   ),
-                ],
-              ),
+                ),
+                const SizedBox(
+                  height: 24,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _selectedCategory.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+                DefaultTabController(
+                  length: 2,
+                  child: Column(
+                    children: [
+                      const TabBar(
+                        tabs: [
+                          Tab(
+                            text: "Subjects",
+                          ),
+                          Tab(
+                            text: "Quizzes",
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 400,
+                        child: TabBarView(
+                          children: [
+                            ListView(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "Subjects",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible:
+                                            _loadedSubCategories.length == 4,
+                                        child: InkWell(
+                                          child: const Text(
+                                            "See All",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SingleCategory(
+                                                  categorySlug:
+                                                      _selectedCategory.slug,
+                                                  initialIndex: 0,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 16,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      for (final item in _loadedSubCategories)
+                                        InkWell(
+                                          child: CategoriesCard(
+                                            cardTitle:
+                                                item['sub_category_name'],
+                                            cardDescription: "",
+                                          ),
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SubCategoryPage(
+                                                  subCategoryUrl: item[
+                                                      'sub_category_seo_slug'],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                            ListView(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "Quizzes",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: _loadedQuizzes.length < 4,
+                                        child: InkWell(
+                                          child: const Text(
+                                            "See All",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SingleCategory(
+                                                        categorySlug:
+                                                            _selectedCategory
+                                                                .slug,
+                                                        initialIndex: 1),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 16,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      for (final item in _loadedQuizzes)
+                                        InkWell(
+                                          child: CategoriesCard(
+                                            cardTitle: item['quiz_name'],
+                                            cardDescription: "",
+                                          ),
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    QuizDetailsPage(
+                                                        name: item['quiz_name'],
+                                                        id: item['quiz_id']),
+                                              ),
+                                            );
+                                          },
+                                        )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        )
-
-        // Column(
-        //   children: [
-        //     const SizedBox(
-        //       height: 25,
-        //     ),
-        //     for (final item in _homeCategories)
-        //       GestureDetector(
-        //         onTap: () {
-        //           Navigator.of(context).push(
-        //             CupertinoPageRoute(
-        //               builder: (ctx) => SingleCategory(categorySlug: item.slug),
-        //             ),
-        //           );
-        //         },
-        //         child: Column(
-        //           children: [
-        //             Text(item.name),
-        //             Image.network(
-        //               item.image,
-        //               height: 50,
-        //               width: 75,
-        //             ),
-        //           ],
-        //         ),
-        //       ),
-        //   ],
-        // ),
-        );
+          )
+        : const LoadingSpinner();
   }
 }
