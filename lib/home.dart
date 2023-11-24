@@ -24,6 +24,17 @@ class _HomePageState extends State<HomePage> {
 
   late HomeCategory _selectedCategory;
 
+  String convertTimeStringToFormatted(String timeString) {
+    List<String> timeComponents = timeString.split(':');
+    int hours = int.parse(timeComponents[0]);
+    int minutes = int.parse(timeComponents[1]);
+
+    // Format the time
+    String formattedTime = '${hours}h ${minutes}m';
+
+    return formattedTime;
+  }
+
   void _loadSingleCategory() async {
     final subjects = await supabase
         .from("subcategory")
@@ -369,10 +380,10 @@ class _HomePageState extends State<HomePage> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     SingleCategory(
-                                                        categorySlug:
-                                                            _selectedCategory
-                                                                .slug,
-                                                        initialIndex: 1),
+                                                  categorySlug:
+                                                      _selectedCategory.slug,
+                                                  initialIndex: 1,
+                                                ),
                                               ),
                                             );
                                           },
@@ -394,7 +405,8 @@ class _HomePageState extends State<HomePage> {
                                         InkWell(
                                           child: CategoriesCard(
                                             cardTitle: item['quiz_name'],
-                                            cardDescription: "",
+                                            cardDescription:
+                                                "${item['quiz_total_questions']} Questions | ${convertTimeStringToFormatted(item['quiz_total_duration'])}",
                                             cardType: "Quiz",
                                           ),
                                           onTap: () {
@@ -402,8 +414,9 @@ class _HomePageState extends State<HomePage> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     QuizDetailsPage(
-                                                        name: item['quiz_name'],
-                                                        id: item['quiz_id']),
+                                                  name: item['quiz_name'],
+                                                  id: item['quiz_id'],
+                                                ),
                                               ),
                                             );
                                           },

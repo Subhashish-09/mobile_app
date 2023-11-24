@@ -13,7 +13,6 @@ class CategoriesCard extends StatelessWidget {
 
   final String? cardType;
 
-  @override
   IconData? getIcon() {
     if (cardType == "SubCategory") {
       return Icons.subject;
@@ -26,6 +25,7 @@ class CategoriesCard extends StatelessWidget {
     } else if (cardType == "QuizAttempts") {
       return Icons.check_circle_outline_rounded;
     }
+    return null;
   }
 
   @override
