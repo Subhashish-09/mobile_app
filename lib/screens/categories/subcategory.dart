@@ -82,6 +82,7 @@ class _SubCategoryPage extends State<SubCategoryPage> {
                     child: CategoriesCard(
                       cardTitle: item.name,
                       cardDescription: "25 Practise Tests",
+                      cardType: "Topic",
                     ),
                   )
               ],

@@ -57,30 +57,24 @@ class _SplashScreenPage extends State<SplashSreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(
-          colors: [Colors.blue, Colors.purple],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        )),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.book,
               size: 80,
-              color: Colors.white,
+              color: Colors.greenAccent.shade400,
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Text(
               "Mahatma Academy",
               style: TextStyle(
                 fontStyle: FontStyle.italic,
-                color: Colors.white,
+                color: Colors.greenAccent.shade400,
                 fontSize: 32,
               ),
             )

@@ -5,7 +5,8 @@ import 'package:mobile_app/models/course/details.dart';
 import 'package:mobile_app/models/home/subcategory.dart';
 
 import 'package:mobile_app/models/quiz/details.dart';
-import 'package:mobile_app/screens/categories/topic.dart';
+import 'package:mobile_app/screens/categories/subcategory.dart';
+
 import 'package:mobile_app/screens/quiz/quiz_details.dart';
 import 'package:mobile_app/main.dart';
 
@@ -139,12 +140,13 @@ class _SingleCategoryState extends State<SingleCategory> {
                               child: CategoriesCard(
                                 cardTitle: item.name,
                                 cardDescription: "25 Chapters",
+                                cardType: "SubCategory",
                               ),
                               onTap: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (ctx) => TopicPage(
-                                      topicSlug: item.slug,
+                                    builder: (ctx) => SubCategoryPage(
+                                      subCategoryUrl: item.slug,
                                     ),
                                   ),
                                 );
@@ -165,6 +167,7 @@ class _SingleCategoryState extends State<SingleCategory> {
                               cardTitle: item.name,
                               cardDescription:
                                   "${item.totalQuestions} Questions",
+                              cardType: "Quiz",
                             ),
                             onTap: () {
                               Navigator.of(context).push(

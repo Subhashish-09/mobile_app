@@ -1,25 +1,61 @@
 import 'package:flutter/material.dart';
 
 class CategoriesCard extends StatelessWidget {
-  const CategoriesCard(
-      {super.key, required this.cardTitle, required this.cardDescription});
+  const CategoriesCard({
+    super.key,
+    required this.cardTitle,
+    required this.cardDescription,
+    required this.cardType,
+  });
 
   final String cardTitle;
   final String? cardDescription;
 
+  final String? cardType;
+
+  @override
+  IconData? getIcon() {
+    if (cardType == "SubCategory") {
+      return Icons.subject;
+    } else if (cardType == "Quiz") {
+      return Icons.quiz;
+    } else if (cardType == "Topic") {
+      return Icons.topic;
+    } else if (cardType == "Practise") {
+      return Icons.turned_in_not_sharp;
+    } else if (cardType == "QuizAttempts") {
+      return Icons.check_circle_outline_rounded;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-        child: Card(
-          elevation: 10,
-          surfaceTintColor: Colors.white,
+      margin: const EdgeInsets.only(
+        top: 8,
+        bottom: 8,
+      ),
+      child: Card(
+        elevation: 10,
+        surfaceTintColor: Colors.white,
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+          ),
           child: Row(
             children: [
-              Image.network(
-                "https://media.istockphoto.com/id/1047570732/vector/english.jpg?s=612x612&w=0&k=20&c=zgafUJxCytevU-ZRlrZlTEpw3mLlS_HQTIOHLjaSPPM=",
-                scale: 6,
-                fit: BoxFit.fill,
+              Container(
+                height: 52,
+                width: 52,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Icon(
+                  color: Colors.black,
+                  getIcon(),
+                  size: 52,
+                ),
               ),
               const SizedBox(
                 width: 20,
@@ -38,6 +74,8 @@ class CategoriesCard extends StatelessWidget {
               ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

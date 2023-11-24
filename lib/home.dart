@@ -318,6 +318,7 @@ class _HomePageState extends State<HomePage> {
                                             cardTitle:
                                                 item['sub_category_name'],
                                             cardDescription: "",
+                                            cardType: "SubCategory",
                                           ),
                                           onTap: () {
                                             Navigator.of(context).push(
@@ -394,6 +395,7 @@ class _HomePageState extends State<HomePage> {
                                           child: CategoriesCard(
                                             cardTitle: item['quiz_name'],
                                             cardDescription: "",
+                                            cardType: "Quiz",
                                           ),
                                           onTap: () {
                                             Navigator.of(context).push(

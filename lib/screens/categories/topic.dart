@@ -82,6 +82,7 @@ class _TopicPage extends State<TopicPage> {
                     child: CategoriesCard(
                       cardTitle: item.name,
                       cardDescription: "25 Practise Tests",
+                      cardType: "Practise",
                     ),
                   )
               ],

@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
               Column(
                 children: [
                   SupaEmailAuth(
-                    redirectTo: 'com.example.mobile_app://login-callback',
+                    redirectTo: 'com.mahatmaacademy.android://login-callback',
                     onSignInComplete: (response) {},
                     onSignUpComplete: (response) {},
                     metadataFields: [

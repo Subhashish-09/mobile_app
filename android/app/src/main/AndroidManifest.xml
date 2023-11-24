@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="mobile_app"
+        android:label="Mahatma Academy"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -32,7 +32,7 @@
         <category android:name="android.intent.category.BROWSABLE" />
         <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
         <data
-          android:scheme="com.example.mobile_app"
+          android:scheme="com.mahatmaacademy.android"
           android:host="login-callback" />
       </intent-filter>
         </activity>

@@ -19,7 +19,7 @@ class GoogleSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SignInButton.mini(
+    return SignInButton(
       buttonType: ButtonType.google,
       onPressed: () async {
         final googleUser = await googleSignInData.signIn();
@@ -44,6 +44,8 @@ class GoogleSignInButton extends StatelessWidget {
         );
       },
       buttonSize: ButtonSize.large,
+      btnText: "Continue with Google",
+      padding: 8.5,
     );
   }
 }

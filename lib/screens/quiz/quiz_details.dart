@@ -242,6 +242,7 @@ class _QuizDetailsPageState extends State<QuizDetailsPage> {
                                     cardTitle: "Attempt - ${index + 1}",
                                     cardDescription:
                                         "${item['session_grand_total']} / ${quizDetails['quiz_total_score']} Marks",
+                                    cardType: "QuizAttempts",
                                   ),
                                 ),
                             ],
